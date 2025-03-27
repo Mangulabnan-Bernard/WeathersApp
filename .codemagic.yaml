@@ -1,27 +1,31 @@
 workflows:
-  android-release:
+  android-release:  # Workflow name
     name: Android Release Build
-    max_build_duration: 60
-    instance_type: mac_mini_m1
+    max_build_duration: 60  # Max build time (minutes)
+    instance_type: mac_mini_m1  # Use M1 Mac for faster builds
+
     environment:
       groups:
-        - keystore_credentials  # Keystore passwords from Codemagic
+        - keystore_credentials  # Import keystore credentials from Codemagic
       vars:
-        FLUTTER_VERSION: 3.24.4  # Change to your Flutter version
+        FLUTTER_VERSION: 3.16.0  # Update this to match your Flutter version
+
     scripts:
       - name: Set up Flutter
         script: |
-          flutter --version
-          flutter pub get
+          flutter --version  # Check Flutter version
+          flutter pub get  # Fetch dependencies
 
       - name: Decode Keystore
         script: |
-          echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
-  
+          echo $CM_KEYSTORE | base64 --decode > android/app/weatherapp.keystore  
+          # Decodes your Keystore file from the Codemagic environment variable
 
       - name: Build Android App Bundle
         script: |
-          flutter build appbundle --release
+          flutter build appbundle --release  
+          # Builds an Android App Bundle (.aab) for Google Play
 
     artifacts:
-      - build/app/outputs/bundle/release/app-release.aab  # Uploads .aab file
+      - build/app/outputs/bundle/release/app-release.aab
+      # Uploads the final app bundle for release
