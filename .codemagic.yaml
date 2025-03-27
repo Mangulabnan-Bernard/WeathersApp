@@ -1,23 +1,47 @@
 workflows:
   android-release:
     name: Android Release Build
-    max_build_duration: 60
-    instance_type: mac_mini_m1
+    max_build_duration: 60  # Max build time (minutes)
+    instance_type: mac_mini_m1  # Use M1 Mac for faster builds
+
     environment:
       groups:
-        - keystore_credentials  # Keystore passwords from Codemagic
+        - keystore_credentials  # Import keystore credentials from Codemagic
+        - google_play  # Import Google Play API JSON credentials
       vars:
-        FLUTTER_VERSION: 3.16.0  # Change to your Flutter version
+        FLUTTER_VERSION: 3.24.4  # Match your Flutter version
+
     scripts:
       - name: Set up Flutter
         script: |
-          flutter --version
-          flutter pub get
+          flutter --version  # Check Flutter version
+          flutter pub get  # Fetch dependencies
+
       - name: Decode Keystore
         script: |
-          echo $CM_KEYSTORE | base64 --decode > android/app/weatherapp.keystore
+          echo $CM_KEYSTORE | base64 --decode > android/app/weatherapp.keystore  
+          # Decodes the Keystore file from Codemagic environment variable
+
+      - name: Configure Keystore Signing
+        script: |
+          echo "storePassword=$CM_KEYSTORE_PASSWORD" > android/key.properties
+          echo "keyPassword=$CM_KEY_PASSWORD" >> android/key.properties
+          echo "keyAlias=$CM_KEY_ALIAS" >> android/key.properties
+          echo "storeFile=android/app/weatherapp.keystore" >> android/key.properties
+
       - name: Build Android App Bundle
         script: |
-          flutter build appbundle --release
+          flutter build appbundle --release  
+
     artifacts:
-      - build/app/outputs/bundle/release/app-release.aab  # Uploads .aab file
+      - build/app/outputs/bundle/release/app-release.aab  # Uploads the app bundle
+
+      # ✅ Upload to Google Play (Optional)
+      - name: Upload to Google Play
+        script: |
+          mv build/app/outputs/bundle/release/app-release.aab app-release.aab
+          curl -X POST \
+            -H "Authorization: Bearer $GOOGLE_PLAY_JSON" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @app-release.aab \
+            "https://www.googleapis.com/upload/androidpublisher/v3/applications/com.example.weatherapps/edits?uploadType=resumable"
