@@ -17,6 +17,7 @@ workflows:
       - name: Decode Keystore
         script: |
           echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
+  
 
       - name: Build Android App Bundle
         script: |
