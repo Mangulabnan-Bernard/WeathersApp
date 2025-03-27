@@ -1,14 +1,12 @@
-name: Android Release Build
+name: Android Release
 
 on:
   push:
     branches:
-      - main  # Change this to your branch name if needed
-  workflow_dispatch:  # Allows manual trigger from GitHub Actions
+      - master  # Runs when pushing to master branch
 
 jobs:
   build:
-    name: Build and Release Android App
     runs-on: ubuntu-latest
 
     steps:
@@ -18,16 +16,15 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.24.4"  # Match your Flutter version
+          flutter-version: "3.24.4"
 
       - name: Install Dependencies
         run: flutter pub get
 
       - name: Decode Keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/weatherapp.keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/weatherapp.keystore
 
-      - name: Configure Keystore Properties
+      - name: Configure Keystore Signing
         run: |
           echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
@@ -38,17 +35,7 @@ jobs:
         run: flutter build appbundle --release
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: build/app/outputs/bundle/release/app-release.aab
-
-      - name: Upload to Google Play
-        env:
-          GOOGLE_PLAY_JSON: ${{ secrets.GOOGLE_PLAY_JSON }}
-        run: |
-          echo "$GOOGLE_PLAY_JSON" | base64 --decode > google-play-key.json
-          gcloud auth activate-service-account --key-file=google-play-key.json
-          gcloud --quiet config set project your-google-play-project-id
-          gcloud --quiet firebase appdistribution:apps:list  # Verify authentication
-          gcloud --quiet firebase appdistribution:upload build/app/outputs/bundle/release/app-release.aab --app your-google-play-app-id
