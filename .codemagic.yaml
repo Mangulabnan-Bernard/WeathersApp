@@ -1,0 +1,23 @@
+workflows:
+  android-release:
+    name: Android Release Build
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      groups:
+        - keystore_credentials  # Keystore passwords from Codemagic
+      vars:
+        FLUTTER_VERSION: 3.16.0  # Change to your Flutter version
+    scripts:
+      - name: Set up Flutter
+        script: |
+          flutter --version
+          flutter pub get
+      - name: Decode Keystore
+        script: |
+          echo $CM_KEYSTORE | base64 --decode > android/app/weatherapp.keystore
+      - name: Build Android App Bundle
+        script: |
+          flutter build appbundle --release
+    artifacts:
+      - build/app/outputs/bundle/release/app-release.aab  # Uploads .aab file

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:weatherapps/settings_list/abouts.dart';
+import 'city_list.dart';
 
 class SettingsPage extends StatefulWidget {
   final String initialLocation;
@@ -15,7 +16,6 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _isMetric = true;
-  bool _isLightMode = false;
   late String _locationName;
 
   @override
@@ -40,52 +40,43 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _changeLocation() {
-    final textController = TextEditingController(text: _locationName);
-
-    showCupertinoDialog(
+    showCupertinoModalPopup(
       context: context,
-      builder: (context) {
-        return CupertinoAlertDialog(
-          title: Text('Change Location'),
-          content: CupertinoTextField(
-            controller: textController,
-            placeholder: 'Enter city name',
-          ),
-          actions: [
-            CupertinoDialogAction(
-              child: Text('Save'),
-              onPressed: () async {
-                final cityToCheck = textController.text.trim();
-                final isValid = await _checkCityValid(cityToCheck);
-                if (isValid) {
-                  setState(() {
-                    _locationName = cityToCheck;
-                  });
-                  Navigator.pop(context);
-                } else {
-                  showCupertinoDialog(
-                    context: context,
-                    builder: (context) => CupertinoAlertDialog(
-                      title: Text('City Not Found'),
-                      content: Text('Please enter a valid city name.'),
-                      actions: [
-                        CupertinoDialogAction(
-                          child: Text('OK'),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-              },
-            ),
-            CupertinoDialogAction(
-              child: Text('Close', style: TextStyle(color: CupertinoColors.destructiveRed)),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
-        );
-      },
+      builder: (context) => CupertinoActionSheet(
+        title: Text('Select City'),
+        actions: philippineCities.map((city) {
+          return CupertinoActionSheetAction(
+            child: Text(city),
+            onPressed: () async {
+              final isValid = await _checkCityValid(city);
+              if (isValid) {
+                setState(() {
+                  _locationName = city;
+                });
+                Navigator.pop(context);
+              } else {
+                showCupertinoDialog(
+                  context: context,
+                  builder: (context) => CupertinoAlertDialog(
+                    title: Text('City Not Found'),
+                    content: Text('Please select a valid city name.'),
+                    actions: [
+                      CupertinoDialogAction(
+                        child: Text('OK'),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
+          );
+        }).toList(),
+        cancelButton: CupertinoActionSheetAction(
+          child: Text('Cancel'),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
     );
   }
 
@@ -106,57 +97,38 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text('Settings'),
+        middle: Text('Settings', style: TextStyle(color: CupertinoColors.white)),
+        backgroundColor: CupertinoColors.systemBlue,
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Text('Done'),
+          child: Text('Done', style: TextStyle(color: CupertinoColors.white)),
           onPressed: _onDone,
         ),
       ),
       child: SafeArea(
         child: ListView(
           children: [
-            // Location Section
-            CupertinoListTile(
-              leading: Icon(CupertinoIcons.location, color: CupertinoColors.activeOrange),
-              title: Text('Location'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(_locationName, style: TextStyle(color: CupertinoColors.systemGrey)),
-                  SizedBox(width: 8),
-                  Icon(CupertinoIcons.chevron_forward, color: CupertinoColors.systemGrey2),
-                ],
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Weather Experience',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: CupertinoColors.systemGrey,
+                ),
               ),
+            ),
+            CupertinoListTile(
+              leading: Icon(CupertinoIcons.location_solid, color: CupertinoColors.systemBlue),
+              title: Text('Location', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text('Current: $_locationName', style: TextStyle(color: CupertinoColors.systemGrey)),
               onTap: _changeLocation,
             ),
-
-            // Icon Section
             CupertinoListTile(
-              leading: Icon(CupertinoIcons.photo_fill_on_rectangle_fill, color: CupertinoColors.systemRed),
-              title: Text('Icon'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: CupertinoColors.systemRed,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Icon(CupertinoIcons.chevron_forward, color: CupertinoColors.systemGrey2),
-                ],
-              ),
-              onTap: () {},
-            ),
-
-          
-            CupertinoListTile(
-              leading: Icon(CupertinoIcons.speedometer, color: CupertinoColors.systemGreen),
-              title: Text('Metric System'),
+              leading: Icon(CupertinoIcons.thermometer, color: CupertinoColors.systemGreen),
+              title: Text('Metric System', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text('Switch between Celsius and Fahrenheit', style: TextStyle(color: CupertinoColors.systemGrey)),
               trailing: CupertinoSwitch(
                 value: _isMetric,
                 onChanged: (value) {
@@ -166,21 +138,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
               ),
             ),
-
-             
- 
-           
             CupertinoListTile(
               leading: Icon(CupertinoIcons.info_circle_fill, color: CupertinoColors.activeBlue),
-              title: Text('About'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Members', style: TextStyle(color: CupertinoColors.systemGrey)),
-                  SizedBox(width: 8),
-                  Icon(CupertinoIcons.chevron_forward, color: CupertinoColors.systemGrey2),
-                ],
-              ),
+              title: Text('About', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text('Learn more about the Developers', style: TextStyle(color: CupertinoColors.systemGrey)),
               onTap: _showAboutPage,
             ),
           ],
