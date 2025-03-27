@@ -1,41 +1,68 @@
-name: Android Release
+name: Deploy Weather App to Play Store
 
 on:
   push:
     branches:
-      - master  # Runs when pushing to master branch
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
+    name: Build and Release
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Flutter
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Decode Keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: echo "$KEYSTORE_BASE64" | base64 --decode > android/app/weatherapps.keystore
+
+      - name: Create Key Properties
+        run: |
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=weatherapps" >> android/key.properties
+          echo "storeFile=weatherapps.keystore" >> android/key.properties
+
+      - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.24.4"
+          flutter-version: '3.16.0'
 
       - name: Install Dependencies
         run: flutter pub get
 
-      - name: Decode Keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/weatherapp.keystore
+      - name: Build APK
+        run: flutter build apk --release
 
-      - name: Configure Keystore Signing
-        run: |
-          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
-          echo "storeFile=android/app/weatherapp.keystore" >> android/key.properties
-
-      - name: Build Android App Bundle
+      - name: Build AAB (Android App Bundle)
         run: flutter build appbundle --release
 
-      - name: Upload Artifact
+      - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
+          name: weather-app-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload Release AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: weather-app-aab
           path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Deploy to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
+          packageName: "com.example.weatherapp"
+          releaseFiles: "build/app/outputs/bundle/release/app-release.aab"
+          track: production
+          status: completed
