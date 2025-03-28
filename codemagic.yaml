@@ -7,41 +7,27 @@ workflows:
     scripts:
       # Step 1: Set up Flutter
       - name: Set up Flutter
-        script: |
-          set -e  # Stop the script if any command fails
-          echo "Setting up Flutter"
-          flutter --version || { echo "Flutter setup failed"; exit 1; }
+        script: flutter --version
 
       # Step 2: Get dependencies
       - name: Get dependencies
-        script: |
-          set -e  # Stop the script if any command fails
-          echo "Getting dependencies"
-          flutter pub get || { echo "Failed to get dependencies"; exit 1; }
+        script: flutter pub get
 
-      # Step 3: Copy key.properties file into the android directory
-      - name: Copy key.properties
+      # Step 3: Decode and save key.properties
+      - name: Decode and save key.properties
         script: |
-          set -e  # Stop the script if any command fails
-          echo "Copying key.properties"
-          if [ -z "$CM_KEY_PROPERTIES" ]; then
-            echo "CM_KEY_PROPERTIES is not set" && exit 1
-          fi
-          echo "$CM_KEY_PROPERTIES" > android/key.properties || { echo "Failed to copy key.properties"; exit 1; }
+          echo "Decoding and saving key.properties"
+          echo "$CM_KEY_PROPERTIES" | base64 --decode > android/key.properties
 
       # Step 4: Build APK
       - name: Build APK
         script: |
-          set -e  # Stop the script if any command fails
-          echo "Building APK"
-          flutter build apk --release --dart-define=FLUTTER_WEB_USE_SKIA=true || { echo "APK build failed"; exit 1; }
+          flutter build apk --release --dart-define=FLUTTER_WEB_USE_SKIA=true
 
       # Step 5: Build AAB
       - name: Build AAB
         script: |
-          set -e  # Stop the script if any command fails
-          echo "Building AAB"
-          flutter build appbundle --release --dart-define=FLUTTER_WEB_USE_SKIA=true || { echo "AAB build failed"; exit 1; }
+          flutter build appbundle --release --dart-define=FLUTTER_WEB_USE_SKIA=true
 
     artifacts:
       - "build/app/outputs/flutter-apk/app-release.apk"
