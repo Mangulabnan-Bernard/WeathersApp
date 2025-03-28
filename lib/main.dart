@@ -1,10 +1,53 @@
-import 'package:flutter/cupertino.dart';
-import 'weather_page.dart';
+import 'package:flutter/material.dart';
 
-void main() => runApp(
-  CupertinoApp(
-    debugShowCheckedModeBanner: false,
-    locale: Locale('en', 'US'), // Set the locale to ensure Directionality is provided
-    home: WeatherPage(),
-  ),
-);
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: CounterPage(),
+    );
+  }
+}
+
+class CounterPage extends StatefulWidget {
+  @override
+  _CounterPageState createState() => _CounterPageState();
+}
+
+class _CounterPageState extends State<CounterPage> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Counter'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              '$_counter',
+              style: TextStyle(fontSize: 24),
+            ),
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: _incrementCounter,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
