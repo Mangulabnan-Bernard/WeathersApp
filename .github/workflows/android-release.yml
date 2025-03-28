@@ -3,7 +3,7 @@ name: Deploy Weather App to Play Store
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 
