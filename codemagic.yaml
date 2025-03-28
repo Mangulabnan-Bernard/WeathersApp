@@ -27,6 +27,7 @@ workflows:
       - name: Build APK
         script: flutter build apk --release
 
+
       # Step 6: Build AAB
       - name: Build AAB
         script: flutter build appbundle --release
