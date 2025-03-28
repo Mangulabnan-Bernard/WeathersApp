@@ -13,20 +13,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class CounterPage extends StatefulWidget {
-  @override
-  _CounterPageState createState() => _CounterPageState();
-}
-
-class _CounterPageState extends State<CounterPage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
+class CounterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,18 +21,9 @@ class _CounterPageState extends State<CounterPage> {
         title: Text('Counter'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              '$_counter',
-              style: TextStyle(fontSize: 24),
-            ),
-            IconButton(
-              icon: Icon(Icons.add),
-              onPressed: _incrementCounter,
-            ),
-          ],
+        child: Text(
+          'Counter functionality removed.',
+          style: TextStyle(fontSize: 24),
         ),
       ),
     );
