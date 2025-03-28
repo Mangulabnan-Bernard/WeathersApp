@@ -20,7 +20,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.x  # Use your Flutter version
+          flutter-version: 3.x
 
       - name: Install dependencies
         run: flutter pub get
@@ -28,17 +28,14 @@ jobs:
       - name: Run Tests
         run: flutter test
 
-      # Decode and Save Keystore File from Secret
       - name: Decode Keystore
         run: echo "$KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
-      # Verify that the keystore file was created successfully
       - name: Verify Keystore File
         run: ls -l android/app/keystore.jks
 
-      # Configure signing properties
       - name: Setup Signing Properties
         run: |
           echo "storeFile=keystore.jks" > android/key.properties
@@ -46,23 +43,18 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
 
-      # Debugging: Verify key.properties content
       - name: Verify key.properties content
         run: cat android/key.properties
 
-      # Additional Debugging: Print Environment Variables
       - name: Print Environment Variables
         run: |
           echo "KEYSTORE_PASSWORD is set: ${{ secrets.KEYSTORE_PASSWORD != '' }}"
           echo "KEY_ALIAS is set: ${{ secrets.KEY_ALIAS != '' }}"
           echo "KEY_PASSWORD is set: ${{ secrets.KEY_PASSWORD != '' }}"
 
-      # Build Signed Android App Bundle (.aab) for Play Store
       - name: Build Signed AppBundle
         run: flutter build appbundle --release
 
-
-      # Upload the AppBundle (.aab) as an Artifact
       - name: Upload AAB as Artifact
         uses: actions/upload-artifact@v4
         with:

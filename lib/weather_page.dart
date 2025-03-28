@@ -62,56 +62,59 @@ class _WeatherPageState extends State<WeatherPage> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text("MyWeather"),
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: Icon(CupertinoIcons.settings),
-          onPressed: () async {
-            final result = await Navigator.push(
-              context,
-              CupertinoPageRoute(
-                builder: (context) => SettingsPage(initialLocation: location, isMetric: isMetric),
-              ),
-            );
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: CupertinoPageScaffold(
+        navigationBar: CupertinoNavigationBar(
+          middle: Text("MyWeather"),
+          trailing: CupertinoButton(
+            padding: EdgeInsets.zero,
+            child: Icon(CupertinoIcons.settings),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => SettingsPage(initialLocation: location, isMetric: isMetric),
+                ),
+              );
 
-            if (result != null) {
-              setState(() {
-                location = result['location'];
-                isMetric = result['isMetric'];
-              });
-              getWeatherData();
-            }
-          },
-        ),
-      ),
-      child: SafeArea(
-        child: temp.isNotEmpty
-            ? Center(
-          child: Column(
-            children: [
-              SizedBox(height: 50),
-              Text('My Location', style: TextStyle(fontSize: 35)),
-              SizedBox(height: 5),
-              Text(location),
-              SizedBox(height: 10),
-              Text(temp, style: TextStyle(fontSize: 80)),
-              Icon(weatherStatus, color: CupertinoColors.systemOrange, size: 100),
-              SizedBox(height: 10),
-              Text(weather),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('H: $humidity'),
-                  SizedBox(width: 10),
-                  Text('W: $windSpeed'),
-                ],
-              ),
-            ],
+              if (result != null) {
+                setState(() {
+                  location = result['location'];
+                  isMetric = result['isMetric'];
+                });
+                getWeatherData();
+              }
+            },
           ),
-        )
-            : Center(child: CupertinoActivityIndicator()),
+        ),
+        child: SafeArea(
+          child: temp.isNotEmpty
+              ? Center(
+            child: Column(
+              children: [
+                SizedBox(height: 50),
+                Text('My Location', style: TextStyle(fontSize: 35)),
+                SizedBox(height: 5),
+                Text(location),
+                SizedBox(height: 10),
+                Text(temp, style: TextStyle(fontSize: 80)),
+                Icon(weatherStatus, color: CupertinoColors.systemOrange, size: 100),
+                SizedBox(height: 10),
+                Text(weather),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('H: $humidity'),
+                    SizedBox(width: 10),
+                    Text('W: $windSpeed'),
+                  ],
+                ),
+              ],
+            ),
+          )
+              : Center(child: CupertinoActivityIndicator()),
+        ),
       ),
     );
   }

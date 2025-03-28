@@ -31,11 +31,11 @@ class _SettingsPageState extends State<SettingsPage> {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        if (data["cod"] == 200) {
-          return true;
-        }
+        return data["cod"] == 200;
       }
-    } catch (e) {}
+    } catch (e) {
+      print('Error checking city validity: $e');
+    }
     return false;
   }
 
@@ -55,19 +55,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 });
                 Navigator.pop(context);
               } else {
-                showCupertinoDialog(
-                  context: context,
-                  builder: (context) => CupertinoAlertDialog(
-                    title: Text('City Not Found'),
-                    content: Text('Please select a valid city name.'),
-                    actions: [
-                      CupertinoDialogAction(
-                        child: Text('OK'),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
-                );
+                _showCityNotFoundDialog();
               }
             },
           );
@@ -76,6 +64,22 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Text('Cancel'),
           onPressed: () => Navigator.pop(context),
         ),
+      ),
+    );
+  }
+
+  void _showCityNotFoundDialog() {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: Text('City Not Found'),
+        content: Text('Please select a valid city name.'),
+        actions: [
+          CupertinoDialogAction(
+            child: Text('OK'),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
       ),
     );
   }

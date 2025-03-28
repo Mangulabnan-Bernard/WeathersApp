@@ -20,17 +20,20 @@ class _MetricSystemPageState extends State<MetricSystemPage> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text('Metric System'),
-      ),
-      child: SafeArea(
-        child: Center(
-          child: CupertinoSwitch(
-            value: _isMetric,
-            onChanged: (value) {
-              setState(() => _isMetric = value);
-            },
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: CupertinoPageScaffold(
+        navigationBar: CupertinoNavigationBar(
+          middle: Text('Metric System'),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: CupertinoSwitch(
+              value: _isMetric,
+              onChanged: (value) {
+                setState(() => _isMetric = value);
+              },
+            ),
           ),
         ),
       ),
