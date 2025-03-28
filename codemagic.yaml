@@ -5,7 +5,7 @@
       environment:
         flutter: stable
         groups:
-          - keystore_credentials
+          - key
       scripts:
         - name: Set up Flutter
           script: flutter --version
