@@ -1,68 +1,69 @@
-name: Deploy Weather App to Play Store
+name: Flutter CI/CD
 
 on:
   push:
     branches:
       - master
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
-    name: Build and Release
+    name: Build & Sign Android App
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Decode Keystore
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        run: echo "$KEYSTORE_BASE64" | base64 --decode > android/app/weatherapps.keystore
-
-      - name: Create Key Properties
-        run: |
-          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-          echo "keyAlias=weatherapps" >> android/key.properties
-          echo "storeFile=weatherapps.keystore" >> android/key.properties
-
-      - name: Install Flutter
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.0'
+          flutter-version: 3.x  # Use your Flutter version
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK
-        run: flutter build apk --release
+      - name: Run Tests
+        run: flutter test
 
-      - name: Build AAB (Android App Bundle)
+      # Decode and Save Keystore File from -Secret
+      - name: Decode Keystore
+        run: echo "$KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+
+      # Verify that the keystore file was created successfully
+      - name: Verify Keystore File
+        run: ls -l android/app/keystore.jks
+
+      # Configure signing properties
+      - name: Setup Signing Properties
+        run: |
+          echo "storeFile=keystore.jks" > android/key.properties
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+
+      # Debugging: Verify key.properties content
+      - name: Verify key.properties content
+        run: cat android/key.properties
+
+      # Additional Debugging: Print Environment Variables
+      - name: Print Environment Variables
+        run: |
+          echo "KEYSTORE_PASSWORD is set: ${{ secrets.KEYSTORE_PASSWORD != '' }}"
+          echo "KEY_ALIAS is set: ${{ secrets.KEY_ALIAS != '' }}"
+          echo "KEY_PASSWORD is set: ${{ secrets.KEY_PASSWORD != '' }}"
+
+      # Build Signed Android App Bundle (.aab) for Play Store
+      - name: Build Signed AppBundle
         run: flutter build appbundle --release
 
-      - name: Upload Release APK
+      # Upload the AppBundle (.aab) as an Artifact
+      - name: Upload AAB as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: weather-app-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-
-      - name: Upload Release AAB
-        uses: actions/upload-artifact@v4
-        with:
-          name: weather-app-aab
+          name: android-appbundle
           path: build/app/outputs/bundle/release/app-release.aab
-
-      - name: Deploy to Play Store
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
-          packageName: "com.example.weatherapp"
-          releaseFiles: build/app/outputs/bundle/release/app-release.aab
-          track: production
-          status: completed
