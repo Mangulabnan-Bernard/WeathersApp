@@ -58,7 +58,6 @@ jobs:
           name: weather-app-aab
           path: build/app/outputs/bundle/release/app-release.aab
 
-g
       - name: Deploy to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
