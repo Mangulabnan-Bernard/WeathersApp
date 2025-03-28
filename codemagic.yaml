@@ -7,14 +7,25 @@ workflows:
     scripts:
       - name: Set up Flutter
         script: flutter --version
+
       - name: Get dependencies
         script: flutter pub get
+
+      - name: Copy key.properties
+        script: |
+          echo "Copying key.properties"
+          echo "$CM_KEY_PROPERTIES" > android/key.properties
+          # If your key.properties file is base64 encoded, you can decode it as well:
+          # echo "$CM_KEY_PROPERTIES" | base64 --decode > android/key.properties
+
       - name: Build APK
         script: |
           flutter build apk --release --dart-define=FLUTTER_WEB_USE_SKIA=true
+
       - name: Build AAB
         script: |
           flutter build appbundle --release --dart-define=FLUTTER_WEB_USE_SKIA=true
+
     artifacts:
       - "build/app/outputs/flutter-apk/app-release.apk"
       - "build/app/outputs/bundle/release/app-release.aab"
