@@ -1,46 +1,26 @@
 workflows:
   android-release:
-    name: Android Release Build
-    max_build_duration: 60  # Max build time (minutes)
-    instance_type: mac_mini_m1  # Use M1 Mac for faster builds
-
+    name: Android Release
+    instance_type: mac_mini_m1
     environment:
+      flutter: stable
       groups:
-        - keystore_credentials  # Import keystore credentials from Codemagic
-        - google_play  # Import Google Play API JSON credentials
-      vars:
-        FLUTTER_VERSION: 3.24.4  # Match your Flutter version
-
+        - keystore_credentials
     scripts:
       - name: Set up Flutter
+        script: flutter --version
+      - name: Get dependencies
+        script: flutter pub get
+      - name: Build APK
         script: |
-          flutter --version  # Check Flutter version
-          flutter pub get  # Fetch dependencies
-
-      - name: Decode Keystore
+          flutter build apk --release --dart-define=FLUTTER_WEB_USE_SKIA=true
+      - name: Build AAB
         script: |
-          echo $CM_KEYSTORE | base64 --decode > android/app/weatherapp.keystore  
-          # Decodes the Keystore file from Codemagic environment variable
-
-      - name: Configure Keystore Signing
-        script: |
-          echo "storePassword=$CM_KEYSTORE_PASSWORD" > android/key.properties
-          echo "keyPassword=$CM_KEY_PASSWORD" >> android/key.properties
-          echo "keyAlias=$CM_KEY_ALIAS" >> android/key.properties
-          echo "storeFile=android/app/weatherapp.keystore" >> android/key.properties
-
-      - name: Build Android App Bundle
-        script: |
-          flutter build appbundle --release  
-
-      - name: Upload to Google Play
-        script: |
-          mv build/app/outputs/bundle/release/app-release.aab app-release.aab
-          curl -X POST \
-            -H "Authorization: Bearer $GOOGLE_PLAY_JSON" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary @app-release.aab \
-            "https://www.googleapis.com/upload/androidpublisher/v3/applications/com.example.weatherapps/edits?uploadType=resumable"
-
+          flutter build appbundle --release --dart-define=FLUTTER_WEB_USE_SKIA=true
     artifacts:
-      - build/app/outputs/bundle/release/app-release.aab  # ✅ Correct way to define artifacts
+      - build/app/outputs/flutter-apk/app-release.apk
+      - build/app/outputs/bundle/release/app-release.aab
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
