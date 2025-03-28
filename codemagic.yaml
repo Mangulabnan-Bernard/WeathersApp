@@ -23,13 +23,12 @@ workflows:
         script: |
           echo "$CM_BASE64" | base64 --decode > android/app/weatherapp.keystore
 
-
-      # Step 5: Build APK
+      # Step 5: Build APK (Release)
       - name: Build APK
         script: |
           flutter build apk --release --dart-define=FLUTTER_WEB_USE_SKIA=true
 
-      # Step 6: Build AAB
+      # Step 6: Build AAB (Release)
       - name: Build AAB
         script: |
           flutter build appbundle --release --dart-define=FLUTTER_WEB_USE_SKIA=true
