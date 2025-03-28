@@ -33,10 +33,6 @@ workflows:
         script: |
           flutter build appbundle --release  
 
-    artifacts:
-      - build/app/outputs/bundle/release/app-release.aab  # Uploads the app bundle
-
-      # ✅ Upload to Google Play (Optional)
       - name: Upload to Google Play
         script: |
           mv build/app/outputs/bundle/release/app-release.aab app-release.aab
@@ -45,3 +41,6 @@ workflows:
             -H "Content-Type: application/octet-stream" \
             --data-binary @app-release.aab \
             "https://www.googleapis.com/upload/androidpublisher/v3/applications/com.example.weatherapps/edits?uploadType=resumable"
+
+    artifacts:
+      - build/app/outputs/bundle/release/app-release.aab  # ✅ Correct way to define artifacts
