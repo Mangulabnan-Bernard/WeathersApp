@@ -13,18 +13,22 @@ workflows:
       - name: Get dependencies
         script: flutter pub get
 
-      # Step 3: Decode and save key.properties
-      - name: Decode and save key.properties
+      # Step 3: Decode key.properties from Base64
+      - name: Decode key.properties
         script: |
-          echo "Decoding and saving key.properties"
           echo "$CM_KEY_PROPERTIES" | base64 --decode > android/key.properties
 
-      # Step 4: Build APK
+      # Step 4: Decode keystore from Base64
+      - name: Decode keystore
+        script: |
+          echo "$CM_BASE64" | base64 --decode > android/app/weatherapp.keystore
+
+      # Step 5: Build APK
       - name: Build APK
         script: |
           flutter build apk --release --dart-define=FLUTTER_WEB_USE_SKIA=true
 
-      # Step 5: Build AAB
+      # Step 6: Build AAB
       - name: Build AAB
         script: |
           flutter build appbundle --release --dart-define=FLUTTER_WEB_USE_SKIA=true
