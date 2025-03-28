@@ -5,26 +5,43 @@ workflows:
     environment:
       flutter: stable
     scripts:
+      # Step 1: Set up Flutter
       - name: Set up Flutter
-        script: flutter --version
+        script: |
+          set -e  # Stop the script if any command fails
+          echo "Setting up Flutter"
+          flutter --version || { echo "Flutter setup failed"; exit 1; }
 
+      # Step 2: Get dependencies
       - name: Get dependencies
-        script: flutter pub get
+        script: |
+          set -e  # Stop the script if any command fails
+          echo "Getting dependencies"
+          flutter pub get || { echo "Failed to get dependencies"; exit 1; }
 
+      # Step 3: Copy key.properties file into the android directory
       - name: Copy key.properties
         script: |
+          set -e  # Stop the script if any command fails
           echo "Copying key.properties"
-          echo "$CM_KEY_PROPERTIES" > android/key.properties
-          # If your key.properties file is base64 encoded, you can decode it as well:
-          # echo "$CM_KEY_PROPERTIES" | base64 --decode > android/key.properties
+          if [ -z "$CM_KEY_PROPERTIES" ]; then
+            echo "CM_KEY_PROPERTIES is not set" && exit 1
+          fi
+          echo "$CM_KEY_PROPERTIES" > android/key.properties || { echo "Failed to copy key.properties"; exit 1; }
 
+      # Step 4: Build APK
       - name: Build APK
         script: |
-          flutter build apk --release --dart-define=FLUTTER_WEB_USE_SKIA=true
+          set -e  # Stop the script if any command fails
+          echo "Building APK"
+          flutter build apk --release --dart-define=FLUTTER_WEB_USE_SKIA=true || { echo "APK build failed"; exit 1; }
 
+      # Step 5: Build AAB
       - name: Build AAB
         script: |
-          flutter build appbundle --release --dart-define=FLUTTER_WEB_USE_SKIA=true
+          set -e  # Stop the script if any command fails
+          echo "Building AAB"
+          flutter build appbundle --release --dart-define=FLUTTER_WEB_USE_SKIA=true || { echo "AAB build failed"; exit 1; }
 
     artifacts:
       - "build/app/outputs/flutter-apk/app-release.apk"
