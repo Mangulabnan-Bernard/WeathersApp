@@ -23,6 +23,7 @@ workflows:
         script: |
           echo "$CM_BASE64" | base64 --decode > android/app/weatherapp.keystore
 
+
       # Step 5: Build APK
       - name: Build APK
         script: |
