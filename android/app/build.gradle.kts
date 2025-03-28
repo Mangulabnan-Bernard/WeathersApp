@@ -3,7 +3,7 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    id("kotlin-android") version "1.9.20" // Ensure this version is compatible with your setup
+    id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
 }
 
