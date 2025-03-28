@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.weatherapps"
+    namespace = "com.developer.weatherapps"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -23,7 +23,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.weatherapps"
+        applicationId = "com.developer.weatherapps"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -40,10 +40,11 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(keystoreProperties["storeFile"] as String)
-            storePassword = keystoreProperties["storePassword"] as String
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
+            // Check if properties are available before accessing them
+            storeFile = file(keystoreProperties["storeFile"]?.toString() ?: throw IllegalArgumentException("storeFile not found in key.properties"))
+            storePassword = keystoreProperties["storePassword"]?.toString() ?: throw IllegalArgumentException("storePassword not found in key.properties")
+            keyAlias = keystoreProperties["keyAlias"]?.toString() ?: throw IllegalArgumentException("keyAlias not found in key.properties")
+            keyPassword = keystoreProperties["keyPassword"]?.toString() ?: throw IllegalArgumentException("keyPassword not found in key.properties")
         }
     }
 
