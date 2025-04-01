@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:weatherapps/settings_list/abouts.dart';
+import 'Settings/about.dart';
 import 'city_list.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -95,59 +95,56 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(
-          middle: Text('Settings', style: TextStyle(color: CupertinoColors.white)),
-          backgroundColor: CupertinoColors.systemBlue,
-          trailing: CupertinoButton(
-            padding: EdgeInsets.zero,
-            child: Text('Done', style: TextStyle(color: CupertinoColors.white)),
-            onPressed: _onDone,
-          ),
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text('Settings', style: TextStyle(color: CupertinoColors.white)),
+        backgroundColor: CupertinoColors.systemBlue,
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: Text('Done', style: TextStyle(color: CupertinoColors.white)),
+          onPressed: _onDone,
         ),
-        child: SafeArea(
-          child: ListView(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Weather Experience',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: CupertinoColors.systemGrey,
-                  ),
+      ),
+      child: SafeArea(
+        child: ListView(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Weather Experience',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: CupertinoColors.systemGrey,
                 ),
               ),
-              CupertinoListTile(
-                leading: Icon(CupertinoIcons.location_solid, color: CupertinoColors.systemBlue),
-                title: Text('Location', style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text('Current: $_locationName', style: TextStyle(color: CupertinoColors.systemGrey)),
-                onTap: _changeLocation,
+            ),
+            CupertinoListTile(
+              leading: Icon(CupertinoIcons.location_solid, color: CupertinoColors.systemBlue),
+              title: Text('Location', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text('Current: $_locationName', style: TextStyle(color: CupertinoColors.systemGrey)),
+              onTap: _changeLocation,
+            ),
+            CupertinoListTile(
+              leading: Icon(CupertinoIcons.thermometer, color: CupertinoColors.systemGreen),
+              title: Text('Metric System', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text('Switch between Celsius and Fahrenheit', style: TextStyle(color: CupertinoColors.systemGrey)),
+              trailing: CupertinoSwitch(
+                value: _isMetric,
+                onChanged: (value) {
+                  setState(() {
+                    _isMetric = value;
+                  });
+                },
               ),
-              CupertinoListTile(
-                leading: Icon(CupertinoIcons.thermometer, color: CupertinoColors.systemGreen),
-                title: Text('Metric System', style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text('Switch between Celsius and Fahrenheit', style: TextStyle(color: CupertinoColors.systemGrey)),
-                trailing: CupertinoSwitch(
-                  value: _isMetric,
-                  onChanged: (value) {
-                    setState(() {
-                      _isMetric = value;
-                    });
-                  },
-                ),
-              ),
-              CupertinoListTile(
-                leading: Icon(CupertinoIcons.info_circle_fill, color: CupertinoColors.activeBlue),
-                title: Text('About', style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text('Learn more about the Developers', style: TextStyle(color: CupertinoColors.systemGrey)),
-                onTap: _showAboutPage,
-              ),
-            ],
-          ),
+            ),
+            CupertinoListTile(
+              leading: Icon(CupertinoIcons.info_circle_fill, color: CupertinoColors.activeBlue),
+              title: Text('About', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text('Learn more about the Developers', style: TextStyle(color: CupertinoColors.systemGrey)),
+              onTap: _showAboutPage,
+            ),
+          ],
         ),
       ),
     );

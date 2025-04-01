@@ -5,32 +5,27 @@ workflows:
     environment:
       flutter: stable
     scripts:
-      # Step 1: Set up Flutter
+      # Set up Flutter SDK
       - name: Set up Flutter
         script: flutter --version
 
-      # Step 2: Get dependencies
+      # Get dependencies
       - name: Get dependencies
         script: flutter pub get
 
-      # Step 3: Decode key.properties from Base64
+      # Decode key.properties from Base64
       - name: Decode key.properties
         script: |
           echo "$CM_KEY_PROPERTIES" | base64 --decode > android/key.properties
 
-      # Step 4: Decode keystore from Base64
+      # Decode keystore from Base64
       - name: Decode keystore
         script: |
           echo "$CM_BASE64" | base64 --decode > android/app/weatherapp.keystore
 
-      # Step 5: Build APK
-      - name: Build APK
-        script: flutter build apk --release
-
-      # Step 6: Build AAB
+      # Build AAB in release mode (ensure release flag is set)
       - name: Build AAB
         script: flutter build appbundle --release
 
     artifacts:
-      - "build/app/outputs/flutter-apk/app-release.apk"
       - "build/app/outputs/bundle/release/app-release.aab"
