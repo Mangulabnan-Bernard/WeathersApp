@@ -8,8 +8,9 @@ plugins {
 }
 
 android {
-    namespace = "com.developer.weathersapp"
-    compileSdk = flutter.compileSdkVersion
+    namespace = "com.developers.weathersapp"  // ✅ FIXED: Correct namespace declaration
+    compileSdk = 34  // ✅ FIXED: Use explicit SDK version
+
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -22,25 +23,27 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.developer.weathersapp"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        applicationId = "com.developers.weathersapp"
+        minSdk = 21  // ✅ FIXED: Explicit minSdk version
+        targetSdk = 34  // ✅ FIXED: Explicit targetSdk version
+        versionCode = 1
+        versionName = "1.0"
     }
 
     // Load keystore properties for signing
     val keystorePropertiesFile = rootProject.file("key.properties")
     val keystoreProperties = Properties()
 
-    if (keystorePropertiesFile.exists()) {
-        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-    } else {
-        throw GradleException("Key properties file not found.")
+    try {
+        if (keystorePropertiesFile.exists()) {
+            keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+        }
+    } catch (e: Exception) {
+        throw GradleException("Error loading keystore properties: ${e.message}")
     }
 
     signingConfigs {
-        create("release") {
+        create("release").apply {
             storeFile = file(keystoreProperties["storeFile"]?.toString() ?: throw GradleException("Keystore file not specified"))
             storePassword = keystoreProperties["storePassword"]?.toString() ?: throw GradleException("Keystore password not specified")
             keyAlias = keystoreProperties["keyAlias"]?.toString() ?: throw GradleException("Key alias not specified")
@@ -60,4 +63,3 @@ android {
 flutter {
     source = "../.."
 }
-
