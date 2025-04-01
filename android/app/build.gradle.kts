@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.developer.weatherapps"
+    namespace = "com.developer.weatherapp"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -22,7 +22,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.developer.weatherapps"
+        applicationId = "com.developer.weatherapp"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -60,3 +60,5 @@ android {
 flutter {
     source = "../.."
 }
+
+
