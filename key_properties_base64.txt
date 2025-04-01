@@ -1,5 +1,0 @@
------BEGIN CERTIFICATE-----
-c3RvcmVGaWxlPXdlYXRoZXJhcHAua2V5c3RvcmUNCnN0b3JlUGFzc3dvcmQ9d2Vh
-dGhlcmFwcA0Ka2V5QWxpYXM9d2VhdGhlcg0Ka2V5UGFzc3dvcmQ9d2VhdGhlcmFw
-cA0K
------END CERTIFICATE-----
