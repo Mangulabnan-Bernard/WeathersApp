@@ -24,10 +24,10 @@ android {
 
     defaultConfig {
         applicationId = "com.developers.weathersapp"
-        minSdk = 21  // ✅ FIXED: Explicit minSdk version
-        targetSdk = 34  // ✅ FIXED: Explicit targetSdk version
-        versionCode = 1
-        versionName = "1.0"
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
     }
 
     // Load keystore properties for signing
