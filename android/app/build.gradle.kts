@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.developers.weathersapp"  // ✅ FIXED: Correct namespace declaration
+    namespace = "com.developer.weathersapp"  // ✅ FIXED: Correct namespace declaration
     compileSdk = 34  // ✅ FIXED: Use explicit SDK version
 
     ndkVersion = "27.0.12077973"
