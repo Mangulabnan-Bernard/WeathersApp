@@ -89,22 +89,22 @@ class _WeatherPageState extends State<WeatherPage> {
   }
 
   Color _getTemperatureColor(double temp) {
-    if (temp >= 30) {
+    if (temp >= 37) {
       return CupertinoColors.systemRed; // High temp, red
-    } else if (temp >= 20) {
-      return CupertinoColors.systemOrange; // Moderate temp, orange
+    } else if (temp >= 26) {
+      return CupertinoColors.systemBlue; // Moderate temp, orange
     } else {
-      return CupertinoColors.systemBlue; // Low temp, blue
+      return CupertinoColors.systemYellow; // Low temp, yellow
     }
   }
 
   Color _getWeatherIconColor(double temp) {
-    if (temp >= 30) {
-      return CupertinoColors.systemRed;
-    } else if (temp >= 20) {
-      return CupertinoColors.systemOrange;
+    if (temp >= 37) {
+      return CupertinoColors.systemRed; // High temp, red
+    } else if (temp >= 26) {
+      return CupertinoColors.systemBlue; // Moderate temp, orange
     } else {
-      return CupertinoColors.systemBlue;
+      return CupertinoColors.systemYellow; // Low temp, yellow
     }
   }
 
